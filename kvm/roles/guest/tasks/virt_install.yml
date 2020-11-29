@@ -1,41 +1,21 @@
 ---
-- name: virsh domstats --domain
-  shell: virsh domstats --domain fedora33
-  register: debug_domain_exist
-  failed_when: false
-  changed_when: false
-  check_mode: no
-
-- name: domain exist check
-  debug: 
-    msg: '{{ debug_domain_exist.stdout }}'
-  when: debug_domain_exist.rc == 0
-
-- name: iso copy
-  copy:
-    src: roles/guest/files/Fedora-Server-dvd-x86_64-33-1.2.iso
-    dest: /tmp
-  when: debug_domain_exist.rc == 1
-
-- name: setup kikstart cfg
+- name: put kick start
   template:
-    src: ks.cfg.j2
+    src: templates/ks.cfg.j2
     dest: /tmp/ks.cfg
     owner: root
     group: root
-    mode: 0700
-    backup: no
-  when: debug_domain_exist.rc == 1
+    mode: 0644
 
-- name: virt-install
+- name: Define VM
   shell: >
     virt-install \
-    --name fedora33 \
-    --disk pool=kvm_pool,size=20 \
+    --name fedora33-test3 \
+    --disk pool=kvm_pool,format=qcow2,size=100 \
     --vcpus 2 \
     --ram 4096 \
     --os-type linux \
-    --os-variant fedora30 \
+    --os-variant fedora33 \
     --network bridge=br-isolate-vm \
     --graphics none \
     --console pty,target_type=serial \
@@ -43,7 +23,25 @@
     --initrd-inject /tmp/ks.cfg \
     --extra-args \
       'inst.ks=file:/ks.cfg console=ttyS0,115200n8 serial'
-  register: debug_virt_install
-  failed_when: false
-  changed_when: false
-  when: debug_domain_exist.rc == 1
+
+- name: wait vm create
+  virt:
+    name: fedora33-test2
+    command: status
+  register: result
+  until: result.status == 'shutdown'
+  retries: 5
+  delay: 60
+#  delegate_to: "{{ host_ip }}"
+
+- name: shutdown vm 
+  virt:
+    name: fedora33-test2
+    command: shutdown
+  when: result.status == 'running'
+
+- name: destroy vm 
+  virt:
+    name: fedora33-test2
+    command: shutdown
+  when: result.status == 'running'
