@@ -1,0 +1,19 @@
+---
+# Note: checksum infomation
+#  Fedora-Cloud-Base-33-1.2.x86_64.qcow2: 283299840 bytes
+#  SHA256 (Fedora-Cloud-Base-33-1.2.x86_64.qcow2) = 7a2b3cc3bb3a92ce927e685d33efe8efd75577efbe207b267cb66f68afae7ce9
+#  see https://getfedora.org/static/checksums/Fedora-Cloud-33-1.2-x86_64-CHECKSUM 
+
+- name: get image
+  get_url: url=https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
+            sha256sum=7a2b3cc3bb3a92ce927e685d33efe8efd75577efbe207b267cb66f68afae7ce9
+            dest=/tmp/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
+            force=True
+
+- name: set image
+  copy:
+    src: /tmp/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
+    dest: /var/lib/libvirt/images/kvm_pool/k8s-master01.qcow2
+
+- name: resize image
+  shell: "qemu-img resize /var/lib/libvirt/images/kvm_pool/k8s-master01.qcow2 20G"

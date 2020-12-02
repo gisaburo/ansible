@@ -6,3 +6,6 @@ ansible-playbook -i localhost, -c local local.yml --ask-become-pass --tags "gues
 ansible-playbook -i inventory kvm.yml --ask-become-pass --tags "network" --check
 ansible-playbook -i inventory kvm.yml --ask-become-pass --tags "storage" --check
 ansible-playbook -i inventory kvm.yml --ask-become-pass --tags "guest"
+
+
+sudo dnf install libguestfs-tools-c

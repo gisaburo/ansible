@@ -1,6 +1,4 @@
 ---
-#- include_tasks: roles/guest/tasks/virt_install.yml
-- include_tasks: roles/guest/tasks/cumulus.yml
-  loop: '{{ pool_list }}'
-  loop_control:
-    loop_var: outer_item
+#- include_tasks: roles/guest/tasks/set-image.yml
+- include_tasks: roles/guest/tasks/set-cloud-init.yml
+#- include_tasks: roles/guest/tasks/launch-instance.yml

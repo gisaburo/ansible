@@ -18,7 +18,7 @@ keyboard --vckeymap=us --xlayouts='us'
 lang en_US.UTF-8
 
 # Network information
-network  --bootproto=static --device=enp1s0 --gateway=192.168.100.1 --ip=192.168.100.3 --nameserver=192.168.100.1 --netmask=255.255.255.248 --ipv6=auto --no-activate
+network  --bootproto=static --device=enp1s0 --gateway=172.16.100.1 --ip=172.16.100.11 --nameserver=172.16.100.1 --netmask=255.255.255.0 --ipv6=auto --no-activate
 network  --hostname=fedora
 
 # Use CDROM installation media
@@ -55,6 +55,3 @@ pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
 pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
 pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
 %end
-
-# poweroff
-poweroff

@@ -1,0 +1,24 @@
+---
+- name: put mata data
+  template:
+    src: templates/meta-data.j2
+    dest: /tmp/meta-data
+    owner: root
+    group: root
+    mode: 0777
+
+- name: put user data
+  template:
+    src: templates/user-data.j2
+    dest: /tmp/user-data
+    owner: root
+    group: root
+    mode: 0777
+
+- name: delete iso
+  file:
+    state: absent
+    path: /tmp/config.iso
+
+- name: make iso
+  shell: "genisoimage -o /tmp/config.iso -V cidata -r -J /tmp/meta-data /tmp/user-data"

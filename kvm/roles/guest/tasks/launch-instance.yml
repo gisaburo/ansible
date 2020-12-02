@@ -1,0 +1,35 @@
+---
+- name: list vms
+  virt:
+    command: list_vms
+  register: result_vms
+
+- name: exist vm 
+  debug:
+    msg: "'k8s-master01' already exist"
+  when: "'k8s-master01' in result_vms.list_vms"
+
+- block:
+  - name: define VM
+    shell: >
+      virt-install \
+      --name k8s-master01 \
+      --ram 1024 \
+      --vcpus 1 \
+      --os-type linux \
+      --os-variant fedora33 \
+      --virt-type kvm \
+      --graphics none \
+      --network bridge=br-private-vm \
+      --disk /var/lib/libvirt/images/kvm_pool/k8s-master01.qcow2,format=qcow2 \
+      --import \
+      --cdrom /tmp/config.iso
+
+  - name: ping
+    shell: "ping -c 1 localhost"
+    register: result
+    until: result.rc == 0
+    retries: 100
+    delay: 10
+
+  when: "'k8s-master01' not in result_vms.list_vms"

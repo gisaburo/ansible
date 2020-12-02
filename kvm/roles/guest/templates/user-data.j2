@@ -1,0 +1,19 @@
+#cloud-config
+
+# Set the default user
+system_info:
+  default_user:
+    name: fedora
+
+# Unlock the default user
+chpasswd:
+  list: |
+     fedora:fedora
+  expire: False
+
+# Other settings
+timezone: Asia/Tokyo
+
+# Add any ssh public keys
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDWMA3+NlkGsrIrxEWEpJ7ZQrxL8K5CdqH1CdtvJ7gn4CWSLgFn2TJ1nbDXfDlzmyKccC6CeDcv4quiPuQE6mKiJFuTCC0iDyf31PJig6TuUbcqzKPko1I3llhVYePjZIF0IctwX8xRU8aS/1VYy93Jl/fdUngtBHsz6jeaIwGUMjT7t7eRdKv/GalFzRg/HStnvaVL7ucsQX8UnW3a7HzXJSdcqdSZWfJOsMbwPrpPMnEFBxMjhOMWCjj9TURbA5S8TNhmeYBXL6LMI6ZstofbczYDXFZsU4BoLMjwOlY3G4vjjK0MHkkHtqwL5nB3lZbOqUTI4hHIUXpU5bL5a0bO8DoEF3O2d2UDnjqbXXCNeQ3aZxOMAzfGeYsTqHr2f8tN/WSdJ4IP6hIICrY0Qujz3y2T14Ysk4zDlB4ZZaaOrI4xJJrxf1BeuWfAdMZgj5fFiViZXU2foaeR1GOjVzTWqdhYmf5FdbqTAl2rMPY7GIUFFt1zwoYyBeu4KtM2Pmc= fedora@localhost

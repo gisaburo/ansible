@@ -1,4 +1,11 @@
 ---
-cumulus:
-  - br-isolate-rt
-  - br-isolate-vm
+host:
+  k8s:
+    instance: k8s-master01
+    instance_id: k8s-master01
+    local_hostname: k8s-master01.domain
+    address: 172.16.100.100
+    network: 172.16.100.0
+    netmask: 255.255.255.0
+    broadcast: 172.16.100.100
+    gateway: 172.16.100.1

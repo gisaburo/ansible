@@ -1,0 +1,47 @@
+---
+- name: list vms
+  virt:
+    command: list_vms
+  register: result_vms
+
+- name: exist vm 
+  debug:
+    msg: "'k8s-worker01' already exist"
+  when: "'k8s-worker01' in result_vms.list_vms"
+
+- block:
+  - name: put kickstart
+    template:
+      src: templates/k8s-worker01.cfg.j2
+      dest: /tmp/k8s-worker01.cfg
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Define VM
+    shell: >
+      virt-install \
+      --name k8s-worker01 \
+      --disk pool=kvm_pool,format=qcow2,size=20 \
+      --vcpus 2 \
+      --ram 4096 \
+      --os-type linux \
+      --os-variant fedora33 \
+      --network bridge=br-private-vm \
+      --graphics none \
+      --console pty,target_type=serial \
+      --location /tmp/Fedora-Server-dvd-x86_64-33-1.2.iso \
+      --initrd-inject /tmp/k8s-worker01.cfg \
+      --extra-args \
+        'inst.ks=file:/k8s-worker01.cfg console=ttyS0,115200n8 serial'
+
+  - name: wait vm create
+    virt:
+      name: k8s-worker01
+      command: status
+    register: result_wait
+    until: result_wait.status == 'shutdown'
+    retries: 10
+    delay: 60
+
+  when: "'k8s-worker01' not in result_vms.list_vms"
