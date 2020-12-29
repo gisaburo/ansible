@@ -1,4 +1,0 @@
----
-#- include_tasks: roles/guest/tasks/set-image.yml
-- include_tasks: roles/guest/tasks/set-cloud-init.yml
-#- include_tasks: roles/guest/tasks/launch-instance.yml

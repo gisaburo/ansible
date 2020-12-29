@@ -1,0 +1,14 @@
+<network>
+  <name>{{ net.name }}</name>
+  <bridge name='{{ net.bridge_name }}' />
+{% if net.routing.flg %}
+  <forward mode='{{ net.routing.forward_mode }}'/>
+  <ip address='{{ net.routing.ip_address }}' netmask='{{ net.routing.netmask }}'>
+{% if net.dhcp.flg %}
+    <dhcp>
+      <range start='{{ net.dhcp.range.start }}' end='{{ net.dhcp.range.end }}'/>
+    </dhcp>
+{% endif %}
+  </ip>
+{% endif %}
+</network>

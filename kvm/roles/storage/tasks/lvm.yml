@@ -1,7 +1,0 @@
----
-- name: create logical volume
-  lvol:
-    vg: fedora_fedora
-    lv: '{{ outer_item }}'
-    size: 200g
-    shrink: no

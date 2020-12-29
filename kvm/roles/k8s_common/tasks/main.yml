@@ -1,0 +1,85 @@
+- name: update dnf packages exclude kubernetes and cri-o
+  dnf:
+    name: '*'
+    state: latest
+    exclude:
+      - kube*
+      - cri-o
+
+- name: selinux permissived
+  selinux:
+    policy: targeted
+    state: permissive
+  when : ansible_selinux.config_mode == 'enforcing'
+
+- name: change croup v2 ==> cgroup v1
+  shell: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"'
+
+- name: modprobe overlay and br_netfilter
+  modprobe: 
+    name: "{{ item }}"
+    state: present
+  loop: 
+    - overlay
+    - br_netfilter
+
+- name: add module overlay and br_netfilter in module conf
+  copy:
+    src: crio-module
+    dest: /etc/modules-load.d/crio.conf
+    owner: root
+    group: root
+
+- name: add sysctl for rhel distribution
+  copy:
+    src: crio-kernel
+    dest: /etc/sysctl.d/99-kubernetes-crio.conf
+    owner: root
+    group: root
+
+- name: refrect sysctl
+  shell: "sysctl --system"
+
+- name: add kubenetes repo
+  copy:
+    src: kubernetes-repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    group: root
+
+- name: install kubelet and kubeadm and kubectl
+  dnf:
+    name: "{{ item }}"
+    state: present
+    disable_excludes: kubernetes
+  loop: 
+    - kubelet-1.20.1-0
+    - kubeadm-1.20.1-0
+    - kubectl-1.20.1-0
+
+- name: install cri-o from modularity appstream
+  dnf:
+    name: '@cri-o:1.20/default'
+    state: present
+
+- name: start and enable service for kubelet and crio
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop: 
+    - kubelet
+    - crio
+
+- name: add KUBELET_EXTRA_ARGS
+  copy:
+    src: kubelet-extra-args
+    dest: /etc/sysconfig/kubelet
+    owner: root
+    group: root
+
+- name: daemon reload
+  systemd:
+    daemon_reload: yes
+
+- reboot:

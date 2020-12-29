@@ -1,5 +1,0 @@
----
-- include_tasks: roles/network/tasks/net_define.yml
-  loop: '{{ net_list }}'
-  loop_control:
-    loop_var: outer_item

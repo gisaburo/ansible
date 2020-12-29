@@ -1,0 +1,27 @@
+---
+- name: list nets
+  virt_net:
+    command: list_nets
+  register: result_nets
+
+- name: exist nets
+  debug:
+    msg: "'{{ net.name }}' already exist"
+  when: net.name in result_nets.list_nets
+
+- name: net define
+  virt_net:
+    command: define
+    name: '{{ net.name }}'
+    xml: '{{ lookup("template", "templates/net.xml.j2") }}'
+  when: net.name not in result_nets.list_nets
+
+- name: net start
+  virt_net:
+    command: create
+    name: '{{ net.name }}'
+
+- name: net autostart
+  virt_net:
+    autostart: yes
+    name: '{{ net.name }}'

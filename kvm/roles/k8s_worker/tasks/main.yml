@@ -1,0 +1,10 @@
+- name: Copy config to home dir
+  copy:
+    src: /tmp/join-command.sh
+    dest: /tmp/join-command.sh
+    owner: root
+    group: root
+
+- name: Join the node to cluster
+  command: 'sh /tmp/join-command.sh'
+  failed_when: no

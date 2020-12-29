@@ -1,0 +1,42 @@
+---
+- name: check file
+  stat:
+    path: /tmp/{{ instance_id }}.iso
+  register: result_file
+
+- block:
+  - name: delete meta data
+    file:
+      state: absent
+      path: /tmp/meta-data
+
+  - name: delete user data
+    file:
+      state: absent
+      path: /tmp/user-data
+
+  - name: delete iso
+    file:
+      state: absent
+      path: /tmp/{{ instance_id }}.iso
+
+  - name: put mata data
+    template:
+      src: templates/meta-data.j2
+      dest: /tmp/meta-data
+      owner: root
+      group: root
+      mode: 0777
+
+  - name: put user data
+    template:
+      src: templates/user-data.j2
+      dest: /tmp/user-data
+      owner: root
+      group: root
+      mode: 0777
+
+  - name: make iso
+    shell: "genisoimage -o /tmp/{{ instance_id }}.iso -V cidata -r -J /tmp/meta-data /tmp/user-data"
+
+  when: result_file.stat.exists == false

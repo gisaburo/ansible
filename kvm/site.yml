@@ -1,0 +1,6 @@
+---
+- name: "kvm"
+  hosts: kvm
+  become: true
+  roles:
+    - kvm

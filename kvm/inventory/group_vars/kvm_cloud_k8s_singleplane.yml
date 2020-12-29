@@ -1,0 +1,43 @@
+---
+instance_id: '{{ inventory_hostname }}'
+local_hostname: '{{ inventory_hostname }}.domain'
+
+instance:
+  static: true
+  network: 10.0.0.0
+  netmask: 255.255.255.0
+  broadcast: 10.0.0.255
+  gateway: 10.0.0.1
+  dns_nameservers: 10.0.0.1
+  ram: 2048
+  vcpus: 2
+  os_type: linux
+  os_variant: fedora33
+  virt_type: kvm
+  disk: 20G
+  default_user: fedora
+  chpasswd: fedora
+  ssh_authorized_keys: AAAAB3NzaC1yc2EAAAADAQABAAABgQDWMA3+NlkGsrIrxEWEpJ7ZQrxL8K5CdqH1CdtvJ7gn4CWSLgFn2TJ1nbDXfDlzmyKccC6CeDcv4quiPuQE6mKiJFuTCC0iDyf31PJig6TuUbcqzKPko1I3llhVYePjZIF0IctwX8xRU8aS/1VYy93Jl/fdUngtBHsz6jeaIwGUMjT7t7eRdKv/GalFzRg/HStnvaVL7ucsQX8UnW3a7HzXJSdcqdSZWfJOsMbwPrpPMnEFBxMjhOMWCjj9TURbA5S8TNhmeYBXL6LMI6ZstofbczYDXFZsU4BoLMjwOlY3G4vjjK0MHkkHtqwL5nB3lZbOqUTI4hHIUXpU5bL5a0bO8DoEF3O2d2UDnjqbXXCNeQ3aZxOMAzfGeYsTqHr2f8tN/WSdJ4IP6hIICrY0Qujz3y2T14Ysk4zDlB4ZZaaOrI4xJJrxf1BeuWfAdMZgj5fFiViZXU2foaeR1GOjVzTWqdhYmf5FdbqTAl2rMPY7GIUFFt1zwoYyBeu4KtM2Pmc= fedora@localhost
+
+net:
+  name: k8s-net
+  bridge_name: k8s-net
+  routing:
+    flg: true
+    forward_mode: nat
+    ip_address: 10.0.0.1
+    netmask: 255.255.255.0
+  dhcp: 
+    flg: false
+    range:
+      start: 10.0.0.2
+      end: 10.0.0.254
+
+pool:
+  name: kvm_pool
+  path: /var/lib/libvirt/images/kvm_pool
+
+image:
+  sha256sum: 7a2b3cc3bb3a92ce927e685d33efe8efd75577efbe207b267cb66f68afae7ce9
+  url: https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
+  download_path: /tmp/Fedora-Cloud-Base-33-1.2.x86_64.qcow2

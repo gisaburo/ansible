@@ -1,0 +1,95 @@
+---
+- name: check file
+  stat:
+    path: '{{ image.download_path }}'
+  register: result_file
+  
+- name: get image
+  get_url: url='{{ image.url }}'
+           sha256sum='{{ image.sha256sum }}'
+           dest='{{ image.download_path }}'
+           force=True
+  when: result_file.stat.exists == false
+
+- name: set image
+  copy:
+    src: '{{ image.download_path }}'
+    dest: "{{ pool.path }}/{{ instance_id }}.qcow2"
+
+- name: resize image
+  shell: "qemu-img resize {{ pool.path }}/{{ instance_id }}.qcow2 {{ instance.disk }}"
+
+- name: list vms
+  virt:
+    command: list_vms
+  register: result_vms
+
+- name: exist vm 
+  debug:
+    msg: "'{{ instance_id }}' already exist"
+  when: instance_id in result_vms.list_vms
+
+- block:
+  - name: define vm
+    shell: >
+      virt-install \
+      --name {{ instance_id }} \
+      --ram {{ instance.ram }} \
+      --vcpus {{ instance.vcpus }} \
+      --os-type {{ instance.os_type }} \
+      --os-variant {{ instance.os_variant }} \
+      --virt-type {{ instance.virt_type }} \
+      --graphics none \
+      --network bridge={{ net.name }} \
+      --noautoconsole \
+      --disk {{ pool.path }}/{{ instance_id }}.qcow2,format=qcow2 \
+      --import \
+      --cdrom /tmp/{{ instance_id }}.iso
+
+  - name: Sleep for 300 seconds and continue with play
+    wait_for:
+      timeout: 60
+
+  - name: ping
+    shell: "ping -c 1 '{{ address }}'"
+    register: result
+    until: result.rc == 0
+    retries: 100
+    delay: 10
+
+  - name: shutdown vm
+    virt: 
+      name: "{{ instance_id }}"
+      command: shutdown
+
+  - name: wait vm shutdown
+    virt:
+      name: "{{ instance_id }}"
+      command: status
+    register: result
+    until: result.status == 'shutdown'
+    retries: 100
+    delay: 10
+
+  - name: start vm
+    virt: 
+      name: "{{ instance_id }}"
+      command: start
+
+  - name: wait vm start
+    virt:
+      name: "{{ instance_id }}"
+      command: status
+    register: result
+    until: result.status == 'running'
+    retries: 100
+    delay: 10
+
+  - name: ping
+    shell: "ping -c 1 '{{ address }}'"
+    register: result
+    until: result.rc == 0
+    retries: 100
+    delay: 10
+  
+  when: instance_id not in result_vms.list_vms

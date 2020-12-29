@@ -1,0 +1,13 @@
+instance-id: {{ instance_id }}
+local-hostname: {{ local_hostname }}
+{% if instance.static %}
+network-interfaces: |
+  auto eth0
+  iface eth0 inet static
+  address {{ address }}
+  network {{ instance.network }}
+  netmask {{ instance.netmask }}
+  broadcast {{ instance.broadcast }}
+  gateway {{ instance.gateway }}
+  dns-nameservers {{ instance.dns_nameservers }}
+{% endif %}

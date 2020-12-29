@@ -1,0 +1,29 @@
+---
+- name: list pools
+  virt_pool:
+    command: list_pools
+  register: result_pools
+
+- name: exist pools
+  debug:
+    msg: "'{{ pool.name }}' already exist"
+  when: pool.name in result_pools.list_pools
+
+- block:
+  - name: pool define
+    virt_pool:
+      command: define
+      name: '{{ pool.name }}'
+      xml: '{{ lookup("template", "templates/pool.xml.j2") }}'
+    
+  - name: pool start
+    virt_pool:
+      command: create
+      name: '{{ pool.name }}'
+
+  - name: pool autostart
+    virt_pool:
+      autostart: yes
+      name: '{{ pool.name }}'
+
+  when: pool.name not in result_pools.list_pools

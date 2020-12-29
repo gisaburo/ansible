@@ -1,0 +1,22 @@
+[kvm]
+kvm01 ansible_host=localhost
+
+[kvm_cloud_k8s_singleplane]
+cloud-k8s-master ansible_host=localhost
+cloud-k8s-worker01 ansible_host=localhost
+cloud-k8s-worker02 ansible_host=localhost
+cloud-k8s-worker03 ansible_host=localhost
+
+[k8s_common]
+k8s-master ansible_host=10.0.0.11 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+k8s-worker01 ansible_host=10.0.0.12 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+k8s-worker02 ansible_host=10.0.0.13 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+k8s-worker03 ansible_host=10.0.0.14 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[k8s_master_singleplane]
+k8s-master ansible_host=10.0.0.11 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[k8s_worker_singleplane]
+k8s-worker01 ansible_host=10.0.0.12 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+k8s-worker02 ansible_host=10.0.0.13 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa
+k8s-worker03 ansible_host=10.0.0.14 ansible_port=22 ansible_user=fedora ansible_ssh_private_key_file=~/.ssh/id_rsa

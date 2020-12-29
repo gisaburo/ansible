@@ -1,0 +1,95 @@
+---
+- name: pip3 install openshift module
+  pip:
+    name: openshift
+    extra_args: --user
+    executable: pip3
+
+- name: copy kubeadm config
+  template:
+    src: templates/kubeadm-config.j2
+    dest: /tmp/kubeadm-config.yml
+    owner: root
+    group: root
+    mode: 0777
+
+- name: kubeadm init
+  shell: "kubeadm init --config /tmp/kubeadm-config.yml"
+  failed_when: no
+
+
+- name: Settings for using kubectl as the root user
+  shell: "{{ item }}"
+  loop:
+    - 'echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~.bashrc'
+    - 'export KUBECONFIG=/etc/kubernetes/admin.conf'
+
+- name: Mkdir kubeconfig
+  file:
+    path:  /home/{{ default_user }}/.kube
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode:  '0755'
+
+- name: Chmod admin.conf
+  file:
+    path:  /etc/kubernetes/admin.conf
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode:  '0600'
+
+- name: Copy config to home dir
+  synchronize:
+    src:  /etc/kubernetes/admin.conf
+    dest: /home/{{ default_user }}/.kube/config
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Mkdir kubeconfig
+  file:
+    path:  /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode:  '0755'
+
+- name: Chmod admin.conf
+  file:
+    path:  /etc/kubernetes/admin.conf
+    owner: root
+    group: root
+    mode:  '0600'
+
+- name: Copy config to home dir
+  synchronize:
+    src:  /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: download calico
+  get_url:
+    url: https://docs.projectcalico.org/manifests/calico.yaml
+    dest: /tmp/calico.yml
+
+- name: Create calico
+  k8s:
+    state: present
+    src: /tmp/calico.yml
+
+- name: get join command
+  shell: 'kubeadm token create --print-join-command'
+  register: join_command
+
+- name: Copy join command to tmp directory
+  copy:
+    content: "{{ join_command.stdout_lines[0] }}"
+    dest: /tmp/join-command.sh
+    mode: 0777
+
+- name: Fetch stuff from the remote and save to local
+  synchronize:  
+    src: /tmp/join-command.sh
+    dest: /tmp/join-command.sh 
+    mode: pull
+
+- reboot:
