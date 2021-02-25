@@ -1,13 +1,13 @@
-instance-id: {{ instance_id }}
-local-hostname: {{ local_hostname }}
-{% if instance.static %}
+instance-id: {{ cloud_init_instance_id }}
+local-hostname: {{ cloud_init_local_hostname }}
+{% if cloud_init_static %}
 network-interfaces: |
   auto eth0
   iface eth0 inet static
-  address {{ address }}
-  network {{ instance.network }}
-  netmask {{ instance.netmask }}
-  broadcast {{ instance.broadcast }}
-  gateway {{ instance.gateway }}
-  dns-nameservers {{ instance.dns_nameservers }}
+  address {{ cloud_init_address }}
+  network {{ cloud_init_network }}
+  netmask {{ cloud_init_netmask }}
+  broadcast {{ cloud_init_broadcast }}
+  gateway {{ cloud_init_gateway }}
+  dns-nameservers {{ cloud_init_dns_nameservers }}
 {% endif %}

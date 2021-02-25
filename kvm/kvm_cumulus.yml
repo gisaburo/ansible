@@ -1,0 +1,6 @@
+---
+- name: kvm instance configure
+  hosts: kvm_cumulus
+  become: true
+  roles:
+    - kvm_cumulus

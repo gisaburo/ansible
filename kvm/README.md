@@ -11,5 +11,7 @@ ansible-playbook -i inventory kvm.yml --ask-become-pass --tags "guest"
 ansible-playbook -i inventory/hosts site.yml --ask-become-pass
 ansible-playbook -i inventory/hosts qcow.yml --ask-become-pass
 ansible-playbook -i inventory/hosts k8s.yml --ask-become-pass
-ansible-playbook -i inventory/hosts kvm_cloud_k8s_singleplane.yml --ask-become-pass
+ansible-playbook -i inventory/hosts kvm_cloud_k8s_singleplane.yml
+ansible-playbook -i inventory/hosts kvm_cloud_k8s_nfs.yml
 sudo dnf install libguestfs-tools-c
+ansible-inventory -i inventory01.ini --graph

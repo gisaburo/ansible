@@ -1,0 +1,10 @@
+---
+- name: kvm instance configure
+  hosts: kvm_cloud_k8s_nfs
+  become: true
+  serial: 1
+  roles:
+    - kvm_pool
+    - kvm_net
+    - kvm_cloud_metadata
+    - kvm_cloud_fedora_image

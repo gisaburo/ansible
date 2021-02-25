@@ -17,54 +17,43 @@
   shell: "kubeadm init --config /tmp/kubeadm-config.yml"
   failed_when: no
 
-
 - name: Settings for using kubectl as the root user
   shell: "{{ item }}"
   loop:
-    - 'echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> ~.bashrc'
+    - 'echo "export KUBECONFIG=/etc/kubernetes/admin.conf" >> /root/.bashrc'
     - 'export KUBECONFIG=/etc/kubernetes/admin.conf'
 
-- name: Mkdir kubeconfig
+- name: fetch file frome remote to local
+  synchronize:  
+    src: /etc/kubernetes/admin.conf
+    dest: /tmp/admin.conf
+    mode: pull
+
+- name: Mkdir kubeconfig for user
   file:
-    path:  /home/{{ default_user }}/.kube
+    path: /home/{{ cloud_init_default_user }}/.kube
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ cloud_init_default_user }}"
+    group: "{{ cloud_init_default_user }}"
     mode:  '0755'
 
-- name: Chmod admin.conf
-  file:
-    path:  /etc/kubernetes/admin.conf
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode:  '0600'
+- name: Copy config to home dir for user
+  copy:
+    src: /tmp/admin.conf
+    dest: /home/{{ cloud_init_default_user }}/.kube/config
 
-- name: Copy config to home dir
-  synchronize:
-    src:  /etc/kubernetes/admin.conf
-    dest: /home/{{ default_user }}/.kube/config
-  delegate_to: "{{ inventory_hostname }}"
-
-- name: Mkdir kubeconfig
+- name: Mkdir kubeconfig for root
   file:
-    path:  /root/.kube
+    path: /root/.kube
     state: directory
     owner: root
     group: root
     mode:  '0755'
 
-- name: Chmod admin.conf
-  file:
-    path:  /etc/kubernetes/admin.conf
-    owner: root
-    group: root
-    mode:  '0600'
-
-- name: Copy config to home dir
-  synchronize:
-    src:  /etc/kubernetes/admin.conf
+- name: Copy config to home dir for root
+  copy:
+    src: /tmp/admin.conf
     dest: /root/.kube/config
-  delegate_to: "{{ inventory_hostname }}"
 
 - name: download calico
   get_url:
@@ -91,5 +80,3 @@
     src: /tmp/join-command.sh
     dest: /tmp/join-command.sh 
     mode: pull
-
-- reboot:

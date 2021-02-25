@@ -1,2 +1,2 @@
 ---
-default_user: fedora
+cloud_init_default_user: fedora

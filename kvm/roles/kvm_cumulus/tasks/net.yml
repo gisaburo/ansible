@@ -1,0 +1,7 @@
+---
+- name: inner loop
+  debug:
+    msg: "{{ outer_item.value.dhcp }}"
+  #with_dict: "{{ outer_item.value.eth0 }}"
+  #loop_control:
+  #  loop_var: inner_item

@@ -6,24 +6,32 @@
 
 - name: exist pools
   debug:
-    msg: "'{{ pool.name }}' already exist"
-  when: pool.name in result_pools.list_pools
+    msg: "'{{ virt_pool_name }}' already exist"
+  when: virt_pool_name in result_pools.list_pools
 
 - block:
+  - name: make pool directory
+    file:
+      path: "{{ virt_pool_path }}"
+      state: directory
+      owner: root
+      group: root
+      mode:  '0755'
+
   - name: pool define
     virt_pool:
       command: define
-      name: '{{ pool.name }}'
+      name: '{{ virt_pool_name }}'
       xml: '{{ lookup("template", "templates/pool.xml.j2") }}'
     
   - name: pool start
     virt_pool:
       command: create
-      name: '{{ pool.name }}'
+      name: '{{ virt_pool_name }}'
 
   - name: pool autostart
     virt_pool:
       autostart: yes
-      name: '{{ pool.name }}'
+      name: '{{ virt_pool_name }}'
 
-  when: pool.name not in result_pools.list_pools
+  when: virt_pool_name not in result_pools.list_pools

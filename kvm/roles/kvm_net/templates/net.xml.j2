@@ -1,12 +1,12 @@
 <network>
-  <name>{{ net.name }}</name>
-  <bridge name='{{ net.bridge_name }}' />
-{% if net.routing.flg %}
-  <forward mode='{{ net.routing.forward_mode }}'/>
-  <ip address='{{ net.routing.ip_address }}' netmask='{{ net.routing.netmask }}'>
-{% if net.dhcp.flg %}
+  <name>{{ virt_net_name }}</name>
+  <bridge name='{{ virt_net_bridge_name }}' />
+{% if virt_net_forward %}
+  <forward mode='{{ virt_net_forward_mode }}'/>
+  <ip address='{{ virt_net_ip_address }}' netmask='{{ virt_net_netmask }}'>
+{% if virt_net_dhcp %}
     <dhcp>
-      <range start='{{ net.dhcp.range.start }}' end='{{ net.dhcp.range.end }}'/>
+      <range start='{{ virt_net_dhcp_range_start }}' end='{{ virt_net_dhcp_range_end }}'/>
     </dhcp>
 {% endif %}
   </ip>

@@ -1,16 +1,11 @@
 ---
-- name: kvm pool and net configure
-  hosts: kvm_cloud_k8s_singleplane
-  become: true
-  roles:
-    - kvm_pool
-    - kvm_net
-
-- name: cloud image matadata and create instance configure
+- name: kvm instance configure
   hosts: kvm_cloud_k8s_singleplane
   become: true
   serial: 1
   roles:
+    - kvm_pool
+    - kvm_net
     - kvm_cloud_metadata
     - kvm_cloud_fedora_image
 
@@ -31,3 +26,9 @@
   become: true
   roles:
     - k8s_worker
+
+- name: k8s network refresh
+  hosts: k8s_common
+  become: true
+  tasks:
+    - reboot:

@@ -1,24 +1,4 @@
 ---
-- name: check file
-  stat:
-    path: '{{ image.download_path }}'
-  register: result_file
-  
-- name: get image
-  get_url: url='{{ image.url }}'
-           sha256sum='{{ image.sha256sum }}'
-           dest='{{ image.download_path }}'
-           force=True
-  when: result_file.stat.exists == false
-
-- name: set image
-  copy:
-    src: '{{ image.download_path }}'
-    dest: "{{ pool.path }}/{{ instance_id }}.qcow2"
-
-- name: resize image
-  shell: "qemu-img resize {{ pool.path }}/{{ instance_id }}.qcow2 {{ instance.disk }}"
-
 - name: list vms
   virt:
     command: list_vms
@@ -26,32 +6,52 @@
 
 - name: exist vm 
   debug:
-    msg: "'{{ instance_id }}' already exist"
-  when: instance_id in result_vms.list_vms
+    msg: "'{{ cloud_init_instance_id }}' already exist"
+  when: cloud_init_instance_id in result_vms.list_vms
 
 - block:
+  - name: check image file
+    stat:
+      path: '{{ image_download_path }}'
+    register: result_file
+    
+  - name: get image
+    get_url: url='{{ image_url }}'
+            sha256sum='{{ image_sha256sum }}'
+            dest='{{ image_download_path }}'
+            force=True
+    when: result_file.stat.exists == false
+
+  - name: set image
+    copy:
+      src: '{{ image_download_path }}'
+      dest: "{{ virt_pool_path }}/{{ cloud_init_instance_id }}.qcow2"
+
+  - name: resize image
+    shell: "qemu-img resize {{ virt_pool_path }}/{{ cloud_init_instance_id }}.qcow2 {{ virt_disk }}"
+    
   - name: define vm
     shell: >
       virt-install \
-      --name {{ instance_id }} \
-      --ram {{ instance.ram }} \
-      --vcpus {{ instance.vcpus }} \
-      --os-type {{ instance.os_type }} \
-      --os-variant {{ instance.os_variant }} \
-      --virt-type {{ instance.virt_type }} \
+      --name {{ cloud_init_instance_id }} \
+      --ram {{ virt_ram }} \
+      --vcpus {{ virt_vcpus }} \
+      --os-type {{ virt_os_type }} \
+      --os-variant {{ virt_os_variant }} \
+      --virt-type {{ virt_type }} \
       --graphics none \
-      --network bridge={{ net.name }} \
+      --network bridge={{ virt_net_name }} \
       --noautoconsole \
-      --disk {{ pool.path }}/{{ instance_id }}.qcow2,format=qcow2 \
+      --disk {{ virt_pool_path }}/{{ cloud_init_instance_id }}.qcow2,format=qcow2 \
       --import \
-      --cdrom /tmp/{{ instance_id }}.iso
+      --cdrom /tmp/{{ cloud_init_instance_id }}.iso
 
   - name: Sleep for 300 seconds and continue with play
     wait_for:
       timeout: 60
 
   - name: ping
-    shell: "ping -c 1 '{{ address }}'"
+    shell: "ping -c 1 '{{ cloud_init_address }}'"
     register: result
     until: result.rc == 0
     retries: 100
@@ -59,12 +59,12 @@
 
   - name: shutdown vm
     virt: 
-      name: "{{ instance_id }}"
+      name: "{{ cloud_init_instance_id }}"
       command: shutdown
 
   - name: wait vm shutdown
     virt:
-      name: "{{ instance_id }}"
+      name: "{{ cloud_init_instance_id }}"
       command: status
     register: result
     until: result.status == 'shutdown'
@@ -73,12 +73,12 @@
 
   - name: start vm
     virt: 
-      name: "{{ instance_id }}"
+      name: "{{ cloud_init_instance_id }}"
       command: start
 
   - name: wait vm start
     virt:
-      name: "{{ instance_id }}"
+      name: "{{ cloud_init_instance_id }}"
       command: status
     register: result
     until: result.status == 'running'
@@ -86,10 +86,10 @@
     delay: 10
 
   - name: ping
-    shell: "ping -c 1 '{{ address }}'"
+    shell: "ping -c 1 '{{ cloud_init_address }}'"
     register: result
     until: result.rc == 0
     retries: 100
     delay: 10
   
-  when: instance_id not in result_vms.list_vms
+  when: cloud_init_instance_id not in result_vms.list_vms

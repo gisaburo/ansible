@@ -1,0 +1,5 @@
+---
+- include_tasks: net.yml
+  with_dict: "{{ virt_net }}"
+  loop_control:
+    loop_var: outer_item

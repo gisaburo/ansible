@@ -6,22 +6,25 @@
 
 - name: exist nets
   debug:
-    msg: "'{{ net.name }}' already exist"
-  when: net.name in result_nets.list_nets
+    msg: "'{{ virt_net_name }}' already exist"
+  when: virt_net_name in result_nets.list_nets
 
-- name: net define
-  virt_net:
-    command: define
-    name: '{{ net.name }}'
-    xml: '{{ lookup("template", "templates/net.xml.j2") }}'
-  when: net.name not in result_nets.list_nets
+- block:
+  - name: net define
+    virt_net:
+      command: define
+      name: '{{ virt_net_name }}'
+      xml: '{{ lookup("template", "templates/net.xml.j2") }}'
+    when: virt_net_name not in result_nets.list_nets
 
-- name: net start
-  virt_net:
-    command: create
-    name: '{{ net.name }}'
+  - name: net start
+    virt_net:
+      command: create
+      name: '{{ virt_net_name }}'
 
-- name: net autostart
-  virt_net:
-    autostart: yes
-    name: '{{ net.name }}'
+  - name: net autostart
+    virt_net:
+      autostart: yes
+      name: '{{ virt_net_name }}'
+
+  when: virt_net_name not in result_nets.list_nets

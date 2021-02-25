@@ -1,7 +1,7 @@
 ---
 - name: check file
   stat:
-    path: /tmp/{{ instance_id }}.iso
+    path: /tmp/{{ cloud_init_instance_id }}.iso
   register: result_file
 
 - block:
@@ -18,7 +18,7 @@
   - name: delete iso
     file:
       state: absent
-      path: /tmp/{{ instance_id }}.iso
+      path: /tmp/{{ cloud_init_instance_id }}.iso
 
   - name: put mata data
     template:
@@ -37,6 +37,6 @@
       mode: 0777
 
   - name: make iso
-    shell: "genisoimage -o /tmp/{{ instance_id }}.iso -V cidata -r -J /tmp/meta-data /tmp/user-data"
+    shell: "genisoimage -o /tmp/{{ cloud_init_instance_id }}.iso -V cidata -r -J /tmp/meta-data /tmp/user-data"
 
   when: result_file.stat.exists == false

@@ -1,15 +1,11 @@
 #cloud-config
-# Set the default user
 system_info:
   default_user:
-    name: {{ instance.default_user }}
-# Unlock the default user
+    name: {{ cloud_init_default_user }}
 chpasswd:
   list: |
-     {{ instance.default_user }}:{{ instance.chpasswd }}
+     {{ cloud_init_default_user }}:{{ cloud_init_chpasswd }}
   expire: False
-# Other settings
 timezone: Asia/Tokyo
-# Add any ssh public keys
 ssh_authorized_keys:
-  - ssh-rsa {{ instance.ssh_authorized_keys }}
+  - ssh-rsa {{ cloud_init_ssh_authorized_keys }}

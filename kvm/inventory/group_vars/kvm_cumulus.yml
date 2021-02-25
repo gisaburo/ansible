@@ -1,0 +1,46 @@
+---
+virt_ram: 1024
+virt_vcpus: 1
+virt_os_type: linux
+virt_os_variant: fedora33
+virt_type: kvm
+virt_disk: 20G
+
+virt_net:
+  eth0:
+    name: k8s-net
+    bridge_name: k8s-net
+    forward: true
+    forward_mode: nat
+    ip_address: 10.0.0.1
+    netmask: 255.255.255.0
+    dhcp: false
+    dhcp_range_start: 10.0.0.2
+    dhcp_range_end: 10.0.0.254
+  swp1:
+    name: k8s-net
+    bridge_name: k8s-net
+    forward: true
+    forward_mode: nat
+    ip_address: 10.0.0.1
+    netmask: 255.255.255.0
+    dhcp: false
+    dhcp_range_start: 10.0.0.2
+    dhcp_range_end: 10.0.0.254
+
+virt_net_name: k8s-net
+virt_net_bridge_name: k8s-net
+virt_net_forward: true
+virt_net_forward_mode: nat
+virt_net_ip_address: 10.0.0.1
+virt_net_netmask: 255.255.255.0
+virt_net_dhcp: false
+virt_net_dhcp_range_start: 10.0.0.2
+virt_net_dhcp_range_end: 10.0.0.254
+
+virt_pool_name: kvm_pool
+virt_pool_path: /var/lib/libvirt/images/kvm_pool
+
+image_sha256sum: 7a2b3cc3bb3a92ce927e685d33efe8efd75577efbe207b267cb66f68afae7ce9
+image_url: https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
+image_download_path: /tmp/Fedora-Cloud-Base-33-1.2.x86_64.qcow2
